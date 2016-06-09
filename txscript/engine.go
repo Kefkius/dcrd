@@ -65,9 +65,6 @@ const (
 	// ScriptVerifyStrictEncoding defines that signature scripts and
 	// public keys must follow the strict encoding requirements.
 	ScriptVerifyStrictEncoding
-
-	// ScriptAltStackManipulate defines whether to use the upgradable NOP1.
-	ScriptAltStackManipulate
 )
 
 const (
@@ -80,7 +77,11 @@ const (
 
 	// DefaultScriptVersion is the default scripting language version
 	// representing extended Decred script.
-	DefaultScriptVersion = uint16(0)
+	DefaultScriptVersion = uint16(1)
+
+	// TxScriptVersionAltStackManips is the scriptint language version
+	// that OP_MANIPALTSTACK is implemented in.
+	TxScriptVersionAltStackManips = uint16(1)
 )
 
 // halforder is used to tame ECDSA malleability (see BIP0062).

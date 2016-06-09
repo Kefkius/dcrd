@@ -1135,23 +1135,19 @@ func opcodeFromAltStack(op *parsedOpcode, vm *Engine) error {
 // opcodeManipulateAltStack manipulates the alternate data stack depending on
 // the top stack item.
 func opcodeManipulateAltStack(op *parsedOpcode, vm *Engine) error {
-	if !vm.hasFlag(ScriptAltStackManipulate) {
-		if vm.hasFlag(ScriptDiscourageUpgradableNops) {
-			return errors.New("OP_NOP1 reserved for soft-fork " +
-				"upgrades")
-		}
+	if vm.version < TxScriptVersionAltStackManips {
 		return nil
 	}
-
 	manipVal, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
 	if err != nil {
 		return err
 	}
 
-	if manipVal == AltStackDepth {
+	switch manipVal {
+	case AltStackDepth:
 		vm.dstack.PushInt(scriptNum(vm.astack.Depth()))
 		return nil
-	} else if manipVal == AltStackPick {
+	case AltStackPick:
 		val, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
 		if err != nil {
 			return err
@@ -1166,7 +1162,7 @@ func opcodeManipulateAltStack(op *parsedOpcode, vm *Engine) error {
 		}
 		vm.dstack.PushByteArray(so)
 		return nil
-	} else if manipVal == AltStackRoll {
+	case AltStackRoll:
 		val, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
 		if err != nil {
 			return err
@@ -1181,7 +1177,7 @@ func opcodeManipulateAltStack(op *parsedOpcode, vm *Engine) error {
 		}
 		vm.dstack.PushByteArray(so)
 		return nil
-	} else if manipVal == AltStackDelete {
+	case AltStackDelete:
 		val, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
 		if err != nil {
 			return err

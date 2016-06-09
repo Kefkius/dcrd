@@ -37,8 +37,7 @@ const (
 		ScriptDiscourageUpgradableNops |
 		ScriptVerifyCleanStack |
 		ScriptVerifyCheckLockTimeVerify |
-		ScriptVerifyLowS |
-		ScriptAltStackManipulate
+		ScriptVerifyLowS
 )
 
 // ScriptClass is an enumeration for the list of standard types of script.
