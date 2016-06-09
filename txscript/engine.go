@@ -65,6 +65,9 @@ const (
 	// ScriptVerifyStrictEncoding defines that signature scripts and
 	// public keys must follow the strict encoding requirements.
 	ScriptVerifyStrictEncoding
+
+	// ScriptAltStackManipulate defines whether to use the upgradable NOP1.
+	ScriptAltStackManipulate
 )
 
 const (

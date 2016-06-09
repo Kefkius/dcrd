@@ -233,7 +233,7 @@ const (
 	OP_SSTXCHANGE          = 0xbd // 189 DECRED
 	OP_CHECKSIGALT         = 0xbe // 190 DECRED
 	OP_CHECKSIGALTVERIFY   = 0xbf // 191 DECRED
-	OP_UNKNOWN192          = 0xc0 // 192
+	OP_MANIPALTSTACK       = 0xc0 // OP_MANIPALTSTACK
 	OP_UNKNOWN193          = 0xc1 // 193
 	OP_UNKNOWN194          = 0xc2 // 194
 	OP_UNKNOWN195          = 0xc3 // 195
@@ -423,25 +423,26 @@ var opcodeArray = [256]opcode{
 	OP_CHECKLOCKTIMEVERIFY: {OP_CHECKLOCKTIMEVERIFY, "OP_CHECKLOCKTIMEVERIFY", 1, opcodeCheckLockTimeVerify},
 
 	// Stack opcodes.
-	OP_TOALTSTACK:   {OP_TOALTSTACK, "OP_TOALTSTACK", 1, opcodeToAltStack},
-	OP_FROMALTSTACK: {OP_FROMALTSTACK, "OP_FROMALTSTACK", 1, opcodeFromAltStack},
-	OP_2DROP:        {OP_2DROP, "OP_2DROP", 1, opcode2Drop},
-	OP_2DUP:         {OP_2DUP, "OP_2DUP", 1, opcode2Dup},
-	OP_3DUP:         {OP_3DUP, "OP_3DUP", 1, opcode3Dup},
-	OP_2OVER:        {OP_2OVER, "OP_2OVER", 1, opcode2Over},
-	OP_2ROT:         {OP_2ROT, "OP_2ROT", 1, opcode2Rot},
-	OP_2SWAP:        {OP_2SWAP, "OP_2SWAP", 1, opcode2Swap},
-	OP_IFDUP:        {OP_IFDUP, "OP_IFDUP", 1, opcodeIfDup},
-	OP_DEPTH:        {OP_DEPTH, "OP_DEPTH", 1, opcodeDepth},
-	OP_DROP:         {OP_DROP, "OP_DROP", 1, opcodeDrop},
-	OP_DUP:          {OP_DUP, "OP_DUP", 1, opcodeDup},
-	OP_NIP:          {OP_NIP, "OP_NIP", 1, opcodeNip},
-	OP_OVER:         {OP_OVER, "OP_OVER", 1, opcodeOver},
-	OP_PICK:         {OP_PICK, "OP_PICK", 1, opcodePick},
-	OP_ROLL:         {OP_ROLL, "OP_ROLL", 1, opcodeRoll},
-	OP_ROT:          {OP_ROT, "OP_ROT", 1, opcodeRot},
-	OP_SWAP:         {OP_SWAP, "OP_SWAP", 1, opcodeSwap},
-	OP_TUCK:         {OP_TUCK, "OP_TUCK", 1, opcodeTuck},
+	OP_TOALTSTACK:    {OP_TOALTSTACK, "OP_TOALTSTACK", 1, opcodeToAltStack},
+	OP_FROMALTSTACK:  {OP_FROMALTSTACK, "OP_FROMALTSTACK", 1, opcodeFromAltStack},
+	OP_MANIPALTSTACK: {OP_MANIPALTSTACK, "OP_MANIPALTSTACK", 1, opcodeManipulateAltStack},
+	OP_2DROP:         {OP_2DROP, "OP_2DROP", 1, opcode2Drop},
+	OP_2DUP:          {OP_2DUP, "OP_2DUP", 1, opcode2Dup},
+	OP_3DUP:          {OP_3DUP, "OP_3DUP", 1, opcode3Dup},
+	OP_2OVER:         {OP_2OVER, "OP_2OVER", 1, opcode2Over},
+	OP_2ROT:          {OP_2ROT, "OP_2ROT", 1, opcode2Rot},
+	OP_2SWAP:         {OP_2SWAP, "OP_2SWAP", 1, opcode2Swap},
+	OP_IFDUP:         {OP_IFDUP, "OP_IFDUP", 1, opcodeIfDup},
+	OP_DEPTH:         {OP_DEPTH, "OP_DEPTH", 1, opcodeDepth},
+	OP_DROP:          {OP_DROP, "OP_DROP", 1, opcodeDrop},
+	OP_DUP:           {OP_DUP, "OP_DUP", 1, opcodeDup},
+	OP_NIP:           {OP_NIP, "OP_NIP", 1, opcodeNip},
+	OP_OVER:          {OP_OVER, "OP_OVER", 1, opcodeOver},
+	OP_PICK:          {OP_PICK, "OP_PICK", 1, opcodePick},
+	OP_ROLL:          {OP_ROLL, "OP_ROLL", 1, opcodeRoll},
+	OP_ROT:           {OP_ROT, "OP_ROT", 1, opcodeRot},
+	OP_SWAP:          {OP_SWAP, "OP_SWAP", 1, opcodeSwap},
+	OP_TUCK:          {OP_TUCK, "OP_TUCK", 1, opcodeTuck},
 
 	// Splice opcodes.
 	OP_CAT:    {OP_CAT, "OP_CAT", 1, opcodeCat},
@@ -527,7 +528,6 @@ var opcodeArray = [256]opcode{
 	OP_CHECKSIGALTVERIFY: {OP_CHECKSIGALTVERIFY, "OP_CHECKSIGALTVERIFY", 1, opcodeCheckSigAltVerify},
 
 	// Undefined opcodes.
-	OP_UNKNOWN192: {OP_UNKNOWN192, "OP_UNKNOWN192", 1, opcodeNop},
 	OP_UNKNOWN193: {OP_UNKNOWN193, "OP_UNKNOWN193", 1, opcodeNop},
 	OP_UNKNOWN194: {OP_UNKNOWN194, "OP_UNKNOWN194", 1, opcodeNop},
 	OP_UNKNOWN195: {OP_UNKNOWN195, "OP_UNKNOWN195", 1, opcodeNop},
@@ -862,7 +862,7 @@ func opcodeNop(op *parsedOpcode, vm *Engine) error {
 	switch op.opcode.value {
 	case OP_NOP1, OP_NOP3, OP_NOP4, OP_NOP5,
 		OP_NOP6, OP_NOP7, OP_NOP8, OP_NOP9, OP_NOP10,
-		OP_UNKNOWN192, OP_UNKNOWN193,
+		OP_UNKNOWN193,
 		OP_UNKNOWN194, OP_UNKNOWN195,
 		OP_UNKNOWN196, OP_UNKNOWN197,
 		OP_UNKNOWN198, OP_UNKNOWN199,
@@ -1130,6 +1130,74 @@ func opcodeFromAltStack(op *parsedOpcode, vm *Engine) error {
 	vm.dstack.PushByteArray(so)
 
 	return nil
+}
+
+// opcodeManipulateAltStack manipulates the alternate data stack depending on
+// the top stack item.
+func opcodeManipulateAltStack(op *parsedOpcode, vm *Engine) error {
+	if !vm.hasFlag(ScriptAltStackManipulate) {
+		if vm.hasFlag(ScriptDiscourageUpgradableNops) {
+			return errors.New("OP_NOP1 reserved for soft-fork " +
+				"upgrades")
+		}
+		return nil
+	}
+
+	manipVal, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
+	if err != nil {
+		return err
+	}
+
+	if manipVal == AltStackDepth {
+		vm.dstack.PushInt(scriptNum(vm.astack.Depth()))
+		return nil
+	} else if manipVal == AltStackPick {
+		val, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
+		if err != nil {
+			return err
+		}
+		err = vm.astack.PickN(val.Int32())
+		if err != nil {
+			return err
+		}
+		so, err := vm.astack.PopByteArray()
+		if err != nil {
+			return err
+		}
+		vm.dstack.PushByteArray(so)
+		return nil
+	} else if manipVal == AltStackRoll {
+		val, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
+		if err != nil {
+			return err
+		}
+		err = vm.astack.RollN(val.Int32())
+		if err != nil {
+			return err
+		}
+		so, err := vm.astack.PopByteArray()
+		if err != nil {
+			return err
+		}
+		vm.dstack.PushByteArray(so)
+		return nil
+	} else if manipVal == AltStackDelete {
+		val, err := vm.dstack.PopInt(mathOpCodeMaxScriptNumLen)
+		if err != nil {
+			return err
+		}
+		err = vm.astack.RollN(val.Int32())
+		if err != nil {
+			return err
+		}
+		_, err = vm.astack.PopByteArray()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return ErrInvalidAltStackManipulation
 }
 
 // opcode2Drop removes the top 2 items from the data stack.

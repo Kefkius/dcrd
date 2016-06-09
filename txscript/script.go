@@ -39,6 +39,14 @@ const (
 	MaxScriptElementSize  = 2048 // Max bytes pushable to the stack.
 )
 
+// These are the constants that represent alternate data stack operations.
+const (
+	AltStackDepth  = 0x1
+	AltStackPick   = 0x2
+	AltStackRoll   = 0x3
+	AltStackDelete = 0x4
+)
+
 // isSmallInt returns whether or not the opcode is considered a small integer,
 // which is an OP_0, or OP_1 through OP_16.
 func isSmallInt(op *opcode) bool {

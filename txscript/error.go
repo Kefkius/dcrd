@@ -189,4 +189,7 @@ var (
 
 	// ErrP2SHStakeOpCodes indicates a P2SH script contained stake op codes.
 	ErrP2SHStakeOpCodes = errors.New("stake opcodes were found in a p2sh script")
+
+	// ErrInvalidAltStackManipulation indicates an invalid value for alternate data stack manipulation.
+	ErrInvalidAltStackManipulation = errors.New("invalid value for alt stack manipulation")
 )

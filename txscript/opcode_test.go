@@ -82,6 +82,7 @@ func TestOpcodeDisasm(t *testing.T) {
 		0xff: "OP_INVALIDOPCODE", 0xba: "OP_SSTX", 0xbb: "OP_SSGEN",
 		0xbc: "OP_SSRTX", 0xbd: "OP_SSTXCHANGE", 0xbe: "OP_CHECKSIGALT",
 		0xbf: "OP_CHECKSIGALTVERIFY",
+		0xc0: "OP_MANIPALTSTACK",
 	}
 	for opcodeVal, expectedStr := range expectedStrings {
 		var data []byte
@@ -123,7 +124,7 @@ func TestOpcodeDisasm(t *testing.T) {
 			}
 
 		// OP_UNKNOWN#.
-		case opcodeVal >= 0xc0 && opcodeVal <= 0xf8 || opcodeVal == 0xfc:
+		case opcodeVal >= 0xc1 && opcodeVal <= 0xf8 || opcodeVal == 0xfc:
 			expectedStr = "OP_UNKNOWN" + strconv.Itoa(int(opcodeVal))
 		}
 
@@ -185,7 +186,7 @@ func TestOpcodeDisasm(t *testing.T) {
 			}
 
 		// OP_UNKNOWN#.
-		case opcodeVal >= 0xc0 && opcodeVal <= 0xf8 || opcodeVal == 0xfc:
+		case opcodeVal >= 0xc1 && opcodeVal <= 0xf8 || opcodeVal == 0xfc:
 			expectedStr = "OP_UNKNOWN" + strconv.Itoa(int(opcodeVal))
 		}
 
@@ -232,6 +233,11 @@ func TestNewlyEnabledOpCodes(t *testing.T) {
 		0x21, 0x12, 0x34, 0x56, 0x44, 0x55,
 		0x06,
 		0x0f, 0xf0, 0x00, 0xff, 0x88, 0x99,
+	}
+	sigScriptAltStack := []byte{
+		0x51,
+		0x52,
+		0x53,
 	}
 	lotsOf01s := bytes.Repeat([]byte{0x01}, 2050)
 	builder := NewScriptBuilder()
@@ -452,6 +458,61 @@ func TestNewlyEnabledOpCodes(t *testing.T) {
 				0x87, // OP_EQUAL
 			},
 			sigScript: sigScriptLR,
+			expected:  true,
+		},
+		{
+			name: "altstackpick",
+			pkScript: []byte{
+				// Push values to the alt stack since it doesn't persist across scripts.
+				0x6b, 0x6b, 0x6b, // OP_TOALTSTACK
+				0x51, // Pick depth
+				0x52, // AltStackPick
+				0xc0, // OP_MANIPALTSTACK
+				0x52,
+				0x88, // OP_EQUALVERIFY
+				// Ensure that the alt stack is unchanged.
+				0x51, // AltStackDepth
+				0xc0, // OP_MANIPALTSTACK
+				0x53,
+				0x87, // OP_EQUAL
+			},
+			sigScript: sigScriptAltStack,
+			expected:  true,
+		},
+		{
+			name: "altstackroll",
+			pkScript: []byte{
+				// Push values to the alt stack since it doesn't persist across scripts.
+				0x6b, 0x6b, 0x6b, // OP_TOALTSTACK
+				0x51, // Roll depth
+				0x53, // AltStackRoll
+				0xc0, // OP_MANIPALTSTACK
+				0x52,
+				0x88, // OP_EQUALVERIFY
+				// Ensure that the alt stack has been changed.
+				0x51, // AltStackDepth
+				0xc0, // OP_MANIPALTSTACK
+				0x52,
+				0x87, // OP_EQUAL
+			},
+			sigScript: sigScriptAltStack,
+			expected:  true,
+		},
+		{
+			name: "altstackdelete",
+			pkScript: []byte{
+				// Push values to the alt stack since it doesn't persist across scripts.
+				0x6b, 0x6b, 0x6b, // OP_TOALTSTACK
+				0x51, // Delete depth
+				0x54, // AltStackDelete
+				0xc0, // OP_MANIPALTSTACK
+				// Ensure that the alt stack has been changed.
+				0x51, // AltStackDepth
+				0xc0, // OP_MANIPALTSTACK
+				0x52,
+				0x87, // OP_EQUAL
+			},
+			sigScript: sigScriptAltStack,
 			expected:  true,
 		},
 	}
